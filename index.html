@@ -12,16 +12,20 @@
     * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
     body { margin: 0; padding: 0; background-color: #121212; color: #e0e0e0; display: flex; height: 100vh; overflow: hidden; }
 
-    /* Sidebar Navigation */
-    .sidebar { width: 200px; background-color: #1e1e1e; border-right: 1px solid #2d2d2d; display: flex; flex-direction: column; flex-shrink: 0; }
-    .sidebar-header { padding: 15px; font-weight: bold; font-size: 13px; border-bottom: 1px solid #2d2d2d; color: #fff; }
+    /* Sidebar Navigation with Transition */
+    .sidebar { width: 200px; background-color: #1e1e1e; border-right: 1px solid #2d2d2d; display: flex; flex-direction: column; flex-shrink: 0; transition: all 0.3s ease; overflow: hidden; }
+    .sidebar.collapsed { width: 0px; border: none; }
+    .sidebar-header { padding: 15px; font-weight: bold; font-size: 13px; border-bottom: 1px solid #2d2d2d; color: #fff; white-space: nowrap; }
     .menu-list { list-style: none; padding: 0; margin: 0; overflow-y: auto; flex-grow: 1; }
-    .menu-item { padding: 10px 15px; font-size: 12px; cursor: pointer; display: flex; align-items: center; gap: 10px; color: #aaa; border-left: 3px solid transparent; }
+    .menu-item { padding: 10px 15px; font-size: 12px; cursor: pointer; display: flex; align-items: center; gap: 10px; color: #aaa; border-left: 3px solid transparent; white-space: nowrap; }
     .menu-item:hover, .menu-item.active { background-color: #2a2a2a; color: #fff; border-left-color: #3b82f6; }
     
     /* Main Content */
-    .main-content { flex-grow: 1; display: flex; flex-direction: column; overflow: hidden; }
-    .topbar { height: 50px; background-color: #1e1e1e; border-bottom: 1px solid #2d2d2d; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; }
+    .main-content { flex-grow: 1; display: flex; flex-direction: column; overflow: hidden; min-width: 0; }
+    .topbar { height: 50px; background-color: #1e1e1e; border-bottom: 1px solid #2d2d2d; display: flex; align-items: center; justify-content: space-between; padding: 0 15px; }
+    .topbar-left { display: flex; align-items: center; gap: 12px; }
+    .btn-toggle-sidebar { background: transparent; border: 1px solid #3d3d3d; color: #fff; padding: 6px 10px; border-radius: 4px; cursor: pointer; font-size: 14px; transition: background 0.2s; }
+    .btn-toggle-sidebar:hover { background-color: #2a2a2a; }
     .topbar-title { font-size: 16px; font-weight: bold; color: #fff; }
     .action-tools { display: flex; gap: 10px; }
 
@@ -36,12 +40,17 @@
     .content-body { padding: 15px; overflow: auto; flex-grow: 1; display: flex; flex-direction: column; gap: 20px; }
     .section-title { font-size: 13px; font-weight: bold; color: #3b82f6; text-transform: uppercase; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
     
-    table { width: 100%; border-collapse: collapse; font-size: 12px; min-width: 1400px; }
-    th, td { border-bottom: 1px solid #2d2d2d; padding: 8px 10px; text-align: center; vertical-align: middle; }
-    th { background-color: #181818; color: #888; font-weight: 600; text-transform: uppercase; font-size: 11px; }
+    /* Table Responsive & Text Formatting */
+    .table-wrapper { width: 100%; overflow-x: auto; background-color: #181818; border: 1px solid #2d2d2d; border-radius: 6px; }
+    table { width: 100%; border-collapse: collapse; font-size: 12px; min-width: 1500px; }
+    th, td { border-bottom: 1px solid #2d2d2d; padding: 10px 8px; text-align: center; vertical-align: middle; white-space: nowrap; }
+    th { background-color: #181818; color: #aaa; font-weight: 600; text-transform: uppercase; font-size: 11px; }
+
+    /* Specific Cell Styling for BU Name */
+    .col-bu { text-align: left !important; font-weight: bold; color: #fff; min-width: 180px; max-width: 250px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
     /* Entry Card Section */
-    .entry-box { background-color: #1a1a1a; border: 1px solid #3b82f6; border-radius: 6px; padding: 10px; }
+    .entry-box { background-color: #1a1a1a; border: 1px solid #3b82f6; border-radius: 6px; padding: 10px; overflow-x: auto; }
 
     /* Inputs */
     input[type="text"], input[type="number"], select {
@@ -77,33 +86,41 @@
     .modal-desc { font-size: 13px; color: #ccc; margin-bottom: 20px; line-height: 1.5; }
     .bu-highlight { color: #3b82f6; font-size: 16px; font-weight: bold; text-decoration: underline; }
     .modal-buttons { display: flex; justify-content: center; gap: 10px; }
+
+    /* Capture Target Container Style */
+    #captureArea { background-color: #121212; padding: 10px; }
   </style>
 </head>
 <body>
 
-  <div class="sidebar">
+  <div class="sidebar" id="sidebar">
     <div class="sidebar-header"><i class="fa-solid fa-chart-line"></i> Progressive Road Map</div>
     <ul class="menu-list" id="monthMenu"></ul>
   </div>
 
   <div class="main-content">
     <div class="topbar">
-      <div class="topbar-title">Progressive of Road map 2026 - <span id="currentMonthTitle" style="color: #3b82f6;">JAN</span></div>
+      <div class="topbar-left">
+        <button class="btn-toggle-sidebar" onclick="toggleSidebar()" title="เปิด/ปิด แถบซ้ายมือ">
+          <i class="fa-solid fa-bars"></i>
+        </button>
+        <div class="topbar-title">Progressive of Road map 2026 - <span id="currentMonthTitle" style="color: #3b82f6;">JAN</span></div>
+      </div>
       <div class="action-tools">
         <button class="btn-action btn-excel" onclick="exportToExcel()"><i class="fa-regular fa-file-excel"></i> Export Excel</button>
         <button class="btn-action btn-capture" onclick="captureScreen()"><i class="fa-solid fa-camera"></i> แคปหน้าจอ</button>
       </div>
     </div>
 
-    <div class="content-body" id="captureArea">
+    <div class="content-body">
       
-      <div>
+      <div id="formContainer">
         <div class="section-title"><i class="fa-solid fa-pen-to-square"></i> <span id="entryFormTitle">ฟอร์มกรอกข้อมูล / แก้ไขข้อมูล</span></div>
         <div class="entry-box">
           <table>
             <thead>
               <tr>
-                <th style="width: 140px;">BU</th>
+                <th style="width: 200px;">BU</th>
                 <th>Total Task</th>
                 <th>Task Complete</th>
                 <th>Task Delay</th>
@@ -121,7 +138,7 @@
             </thead>
             <tbody>
               <tr id="inputFormRow">
-                <td>
+                <td style="text-align: left;">
                   <select id="in_bu">
                     <option value="">-- เลือก BU --</option>
                     <option value="ISO">ISO</option>
@@ -131,12 +148,20 @@
                     <option value="FC">FC</option>
                     <option value="Purchasing">Purchasing</option>
                     <option value="IT">IT</option>
-                    <option value="BD|Key Account">BD|Key Account</option>
+                    <option value="BD|Key Account|Implementation">BD|Key Account|Implementation</option>
                     <option value="Sale & Marketing">Sale & Marketing</option>
                     <option value="Packing">Packing</option>
-                    <option value="WH- Seq.">WH- Seq.</option>
+                    <option value="WH- Seq. ( AAT | FTM)">WH- Seq. ( AAT | FTM)</option>
                     <option value="Transportation- EISE">Transportation- EISE</option>
                     <option value="Transportation- LCB">Transportation- LCB</option>
+                    <option value="Warehouse Supply">Warehouse Supply</option>
+                    <option value="Safety- ESIE">Safety- ESIE</option>
+                    <option value="Inplant & Safety -LCB">Inplant & Safety -LCB</option>
+                    <option value="R&D">R&D</option>
+                    <option value="Production">Production</option>
+                    <option value="SCM | FFMC">SCM | FFMC</option>
+                    <option value="QA(MFG)">QA(MFG)</option>
+                    <option value="Quality">Quality</option>
                   </select>
                 </td>
                 <td><input type="number" id="in_totalTask" oninput="calcInputForm()"></td>
@@ -168,31 +193,33 @@
         </div>
       </div>
 
-      <div>
-        <div class="section-title" style="color: #4ade80;"><i class="fa-solid fa-list-check"></i> รายการที่บันทึกข้อมูลเรียบร้อยแล้ว</div>
-        <table>
-          <thead>
-            <tr>
-              <th style="text-align: left;">BU</th>
-              <th>Total Task</th>
-              <th>Task Complete</th>
-              <th>Task Delay</th>
-              <th>% Task</th>
-              <th>Status Action plan</th>
-              <th>Total KRs</th>
-              <th>On process</th>
-              <th>Achieve</th>
-              <th>Not Achieve</th>
-              <th>On Process %</th>
-              <th>Achieve %</th>
-              <th>Not Achieve %</th>
-              <th>Status KRs</th>
-              <th>จัดการ</th>
-            </tr>
-          </thead>
-          <tbody id="savedTableBody">
-            </tbody>
-        </table>
+      <div id="captureArea">
+        <div class="section-title" style="color: #4ade80;"><i class="fa-solid fa-list-check"></i> รายการที่บันทึกข้อมูลเรียบร้อยแล้ว - <span id="captureMonthTag">JAN</span></div>
+        <div class="table-wrapper">
+          <table id="savedTable">
+            <thead>
+              <tr>
+                <th class="col-bu">BU</th>
+                <th>Total Task</th>
+                <th>Task Complete</th>
+                <th>Task Delay</th>
+                <th>% Task</th>
+                <th>Status Action plan</th>
+                <th>Total KRs</th>
+                <th>On process</th>
+                <th>Achieve</th>
+                <th>Not Achieve</th>
+                <th>On Process %</th>
+                <th>Achieve %</th>
+                <th>Not Achieve %</th>
+                <th>Status KRs</th>
+                <th class="col-action">จัดการ</th>
+              </tr>
+            </thead>
+            <tbody id="savedTableBody">
+              </tbody>
+          </table>
+        </div>
       </div>
 
     </div>
@@ -217,16 +244,22 @@
   <script>
     const months = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
     let currentMonth = "JAN";
-    let editingIndex = -1; // -1 = เพิ่มใหม่, >= 0 = แก้ไขแถวเดิม
+    let editingIndex = -1; 
 
     // โครงสร้างเก็บข้อมูลแต่ละเดือน
     const monthlyDataStore = {};
     months.forEach(m => {
       monthlyDataStore[m] = [
-        { bu: 'ISO', totalTask: 34, taskComplete: 34, taskDelay: 0, totalKRs: 9, onProcess: 2, achieve: 5, notAchieve: 2 },
-        { bu: 'CIC', totalTask: 12, taskComplete: 12, taskDelay: 0, totalKRs: 3, onProcess: 0, achieve: 3, notAchieve: 0 }
+        { bu: 'BD|Key Account|Implementation', totalTask: 34, taskComplete: 34, taskDelay: 0, totalKRs: 9, onProcess: 2, achieve: 5, notAchieve: 2 },
+        { bu: 'WH- Seq. ( AAT | FTM)', totalTask: 12, taskComplete: 12, taskDelay: 0, totalKRs: 3, onProcess: 0, achieve: 3, notAchieve: 0 }
       ];
     });
+
+    // เปิด/ปิด Sidebar
+    function toggleSidebar() {
+      const sidebar = document.getElementById("sidebar");
+      sidebar.classList.toggle("collapsed");
+    }
 
     // 1. เรนเดอร์ Sidebar
     function renderSidebar() {
@@ -244,6 +277,7 @@
     function switchMonth(m) {
       currentMonth = m;
       document.getElementById("currentMonthTitle").innerText = m;
+      document.getElementById("captureMonthTag").innerText = m;
       editingIndex = -1;
       clearForm();
       renderSidebar();
@@ -308,7 +342,6 @@
         return;
       }
 
-      // ดึงชื่อ BU แสดงใน Modal ให้ผู้ใช้เช็ค
       document.getElementById("modalBuName").innerText = bu;
       document.getElementById("confirmModal").style.display = "flex";
     }
@@ -317,7 +350,7 @@
       document.getElementById("confirmModal").style.display = "none";
     }
 
-    // 4. ทำการบันทึกข้อมูลย้ายลงตารางล่าง
+    // 4. บันทึกข้อมูล
     function executeSave() {
       closeModal();
       const itemData = {
@@ -332,10 +365,8 @@
       };
 
       if (editingIndex === -1) {
-        // เพิ่มลงล่าง
         monthlyDataStore[currentMonth].push(itemData);
       } else {
-        // อัปเดตแถวเดิม
         monthlyDataStore[currentMonth][editingIndex] = itemData;
         editingIndex = -1;
       }
@@ -344,7 +375,7 @@
       renderSavedTable();
     }
 
-    // 5. แสดงตารางรายการที่บันทึกแล้วด้านล่าง
+    // 5. แสดงตารางที่บันทึกแล้ว
     function renderSavedTable() {
       const tbody = document.getElementById("savedTableBody");
       tbody.innerHTML = "";
@@ -365,7 +396,7 @@
 
         const tr = document.createElement("tr");
         tr.innerHTML = `
-          <td style="text-align: left; font-weight: bold; color: #fff;">${d.bu}</td>
+          <td class="col-bu">${d.bu}</td>
           <td>${d.totalTask}</td>
           <td>${d.taskComplete}</td>
           <td>${d.taskDelay}</td>
@@ -379,7 +410,7 @@
           <td>${(pAch * 100).toFixed(1)}%</td>
           <td>${(pNot * 100).toFixed(1)}%</td>
           <td>${stKRs}</td>
-          <td>
+          <td class="col-action">
             <button class="btn-icon btn-edit" onclick="editRow(${idx})" title="แก้ไข"><i class="fa-solid fa-pen"></i></button>
             <button class="btn-icon btn-delete" onclick="deleteRow(${idx})" title="ลบ"><i class="fa-solid fa-trash-can"></i></button>
           </td>
@@ -388,7 +419,7 @@
       });
     }
 
-    // 6. กดแก้ไข -> ดึงข้อมูลกลับขึ้นช่องกรอกด้านบน
+    // 6. กดแก้ไข
     function editRow(idx) {
       editingIndex = idx;
       const data = monthlyDataStore[currentMonth][idx];
@@ -435,7 +466,7 @@
       }
     }
 
-    // Export Excel & Capture
+    // Export Excel
     function exportToExcel() {
       const list = monthlyDataStore[currentMonth] || [];
       const worksheet = XLSX.utils.json_to_sheet(list);
@@ -444,12 +475,35 @@
       XLSX.writeFile(workbook, `Progressive_Roadmap_${currentMonth}_2026.xlsx`);
     }
 
+    // 8. ระบบ Capture หน้าจอแบบสมบูรณ์ (ไม่ตัดขอบ ไม่ขาดตัวเลข)
     function captureScreen() {
-      html2canvas(document.getElementById("captureArea"), { backgroundColor: "#121212" }).then(canvas => {
+      const captureArea = document.getElementById("captureArea");
+      const savedTable = document.getElementById("savedTable");
+      
+      // ซ่อนคอลัมน์ปุ่มกด "จัดการ" ชั่วคราวเพื่อให้ภาพรายงานสะอาดตา
+      const actionCols = captureArea.querySelectorAll('.col-action');
+      actionCols.forEach(el => el.style.display = 'none');
+
+      // คำนวณความกว้างเต็มจริงของตาราง
+      const fullWidth = savedTable.scrollWidth + 40;
+
+      html2canvas(captureArea, {
+        backgroundColor: "#121212",
+        scale: 2, // เพิ่มความคมชัดระดับ HD
+        width: fullWidth, // บังคับความกว้างให้เท่ากับความกว้างตารางจริง
+        windowWidth: fullWidth
+      }).then(canvas => {
+        // แสดงคอลัมน์ปุ่มกดกลับมาเหมือนเดิม
+        actionCols.forEach(el => el.style.display = '');
+
+        // โหลดรูปภาพ
         const link = document.createElement('a');
         link.download = `Roadmap_${currentMonth}_2026.png`;
-        link.href = canvas.toDataURL();
+        link.href = canvas.toDataURL("image/png");
         link.click();
+      }).catch(err => {
+        actionCols.forEach(el => el.style.display = '');
+        console.error(err);
       });
     }
 
