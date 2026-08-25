@@ -3,94 +3,175 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Progressive of Achieve Data Grid</title>
+  <title>Progressive of Road map 2026</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
-    * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-    body { padding: 20px; background-color: #f8f9fa; margin: 0; }
-    h2 { color: #333; margin-bottom: 15px; }
-    .table-container { overflow-x: auto; background: #fff; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); padding: 15px; }
-    table { width: 100%; border-collapse: collapse; min-width: 1200px; font-size: 13px; }
-    th, td { border: 1px solid #dee2e6; padding: 8px 10px; text-align: center; }
-    th { background-color: #0d6efd; color: white; font-weight: 600; white-space: nowrap; }
-    tr:nth-child(even) { background-color: #f8f9fa; }
+    * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+    body { margin: 0; padding: 0; background-color: #121212; color: #e0e0e0; display: flex; height: 100vh; overflow: hidden; }
+
+    /* Sidebar Navigation */
+    .sidebar { width: 220px; background-color: #1e1e1e; border-right: 1px solid #2d2d2d; display: flex; flex-direction: column; flex-shrink: 0; }
+    .sidebar-header { padding: 15px; font-weight: bold; font-size: 14px; border-bottom: 1px solid #2d2d2d; color: #fff; }
+    .menu-list { list-style: none; padding: 0; margin: 0; overflow-y: auto; flex-grow: 1; }
+    .menu-item { padding: 10px 15px; font-size: 12px; cursor: pointer; display: flex; align-items: center; gap: 10px; color: #aaa; border-left: 3px solid transparent; }
+    .menu-item:hover, .menu-item.active { background-color: #2a2a2a; color: #fff; border-left-color: #3b82f6; }
+    
+    /* Main Content */
+    .main-content { flex-grow: 1; display: flex; flex-direction: column; overflow: hidden; }
+    
+    /* Top Navbar */
+    .topbar { height: 50px; background-color: #1e1e1e; border-bottom: 1px solid #2d2d2d; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; }
+    .topbar-title { font-size: 16px; font-weight: bold; color: #fff; }
+    .search-box { background-color: #2d2d2d; border-radius: 4px; padding: 5px 12px; display: flex; align-items: center; gap: 8px; width: 300px; }
+    .search-box input { background: transparent; border: none; color: #fff; outline: none; width: 100%; font-size: 12px; }
+
+    /* Table Container */
+    .content-body { padding: 15px; overflow: auto; flex-grow: 1; }
+    .month-title { font-size: 14px; font-weight: bold; margin-bottom: 10px; color: #fff; text-transform: uppercase; }
+    
+    table { width: 100%; border-collapse: collapse; font-size: 12px; min-width: 1400px; }
+    th, td { border-bottom: 1px solid #2d2d2d; padding: 8px 10px; text-align: center; vertical-align: middle; }
+    th { background-color: #181818; color: #888; font-weight: 600; text-transform: uppercase; font-size: 11px; position: sticky; top: 0; z-index: 10; }
+    tr:hover { background-color: #1a1a1a; }
+
+    /* Inputs & Form Elements */
     input[type="text"], input[type="number"] {
-      width: 100%; border: 1px solid #ced4da; border-radius: 4px; padding: 4px 6px; text-align: center; font-size: 13px;
+      background-color: #2a2a2a; border: 1px solid #3d3d3d; color: #fff; padding: 4px 6px; border-radius: 4px; text-align: center; font-size: 12px; width: 100%;
     }
-    input[type="number"]:focus, input[type="text"]:focus {
-      outline: 2px solid #86b7fe; border-color: #86b7fe;
-    }
-    .readonly { background-color: #e9ecef; color: #495057; font-weight: bold; }
+    input[type="number"]:focus, input[type="text"]:focus { outline: 1px solid #3b82f6; border-color: #3b82f6; }
     
-    /* Status Badge Styles */
-    .badge { padding: 4px 8px; border-radius: 12px; font-weight: bold; font-size: 11px; display: inline-block; }
-    .status-complete { background-color: #d1e7dd; color: #0f5132; }
-    .status-delay { background-color: #f8d7da; color: #842029; }
-    .status-achieve { background-color: #d1e7dd; color: #0f5132; }
-    .status-onprocess { background-color: #cff4fc; color: #055160; }
-    .status-notachieve { background-color: #f8d7da; color: #842029; }
-    
-    .btn-add { background-color: #198754; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; margin-top: 15px; }
-    .btn-add:hover { background-color: #157347; }
+    /* Status Badges Matching the Image */
+    .badge { padding: 3px 8px; border-radius: 12px; font-weight: bold; font-size: 11px; display: inline-flex; align-items: center; gap: 4px; width: fit-content; margin: 0 auto; }
+    .bg-complete { background-color: rgba(34, 197, 94, 0.15); color: #4ade80; }
+    .bg-delay { background-color: rgba(239, 68, 68, 0.15); color: #f87171; }
+    .bg-achieve { background-color: rgba(34, 197, 94, 0.15); color: #4ade80; }
+    .bg-onprocess { background-color: rgba(249, 115, 22, 0.15); color: #fb923c; }
+    .bg-notachieve { background-color: rgba(239, 68, 68, 0.15); color: #f87171; }
+
+    /* File Attachment Cell */
+    .file-input-wrapper { display: flex; align-items: center; justify-content: center; gap: 5px; }
+    .file-btn { color: #888; cursor: pointer; font-size: 14px; transition: color 0.2s; }
+    .file-btn:hover { color: #3b82f6; }
+    .file-btn.has-file { color: #4ade80; }
+    input[type="file"] { display: none; }
+
+    .btn-add-row { background-color: #2563eb; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; margin-top: 15px; font-size: 12px; }
+    .btn-add-row:hover { background-color: #1d4ed8; }
   </style>
 </head>
 <body>
 
-  <h2>ตารางบันทึกข้อมูล Progressive of Achieve</h2>
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="sidebar-header"><i class="fa-solid fa-chart-line"></i> Progressive of Road map 2026</div>
+    <ul class="menu-list">
+      <li class="menu-item active"><i class="fa-regular fa-calendar"></i> JAN</li>
+      <li class="menu-item"><i class="fa-regular fa-calendar"></i> FEB</li>
+      <li class="menu-item"><i class="fa-regular fa-calendar"></i> MAR</li>
+      <li class="menu-item"><i class="fa-regular fa-calendar"></i> APR</li>
+      <li class="menu-item"><i class="fa-regular fa-calendar"></i> MAY</li>
+      <li class="menu-item"><i class="fa-regular fa-calendar"></i> JUN</li>
+      <li class="menu-item"><i class="fa-regular fa-calendar"></i> JUL</li>
+      <li class="menu-item"><i class="fa-regular fa-calendar"></i> AUG</li>
+      <li class="menu-item"><i class="fa-regular fa-calendar"></i> SEP</li>
+      <li class="menu-item"><i class="fa-regular fa-calendar"></i> OCT</li>
+      <li class="menu-item"><i class="fa-regular fa-calendar"></i> NOV</li>
+      <li class="menu-item"><i class="fa-regular fa-calendar"></i> DEC</li>
+    </ul>
+  </div>
 
-  <div class="table-container">
-    <table id="excelGrid">
-      <thead>
-        <tr>
-          <th>BU (A)</th>
-          <th>Total Task (B)</th>
-          <th>Task Complete (C)</th>
-          <th>Task Delay (D)</th>
-          <th>% Task (E)</th>
-          <th>Status Action plan (F)</th>
-          <th>Total KRs (G)</th>
-          <th>On Process (H)</th>
-          <th>Achieve (I)</th>
-          <th>Not Achieve (J)</th>
-          <th>On Process % (K)</th>
-          <th>Achieve % (L)</th>
-          <th>Not Achieve % (M)</th>
-          <th>Status KRs (N)</th>
-        </tr>
-      </thead>
-      <tbody>
-        <!-- Data rows generated dynamically -->
-      </tbody>
-    </table>
-    <button class="btn-add" onclick="addRow()">+ เพิ่มแถวข้อมูล</button>
+  <!-- Main Content -->
+  <div class="main-content">
+    <!-- Top Bar -->
+    <div class="topbar">
+      <div class="topbar-title">Progressive of Road map 2026</div>
+      <div class="search-box">
+        <i class="fa-solid fa-magnifying-glass" style="color: #666;"></i>
+        <input type="text" placeholder="Search JAN...">
+      </div>
+    </div>
+
+    <!-- Content Body -->
+    <div class="content-body">
+      <div class="month-title">JAN</div>
+      <table id="roadmapTable">
+        <thead>
+          <tr>
+            <th style="text-align: left;">BU</th>
+            <th>Total Task</th>
+            <th>Task on plan-Complete</th>
+            <th>Task Delay</th>
+            <th>%</th>
+            <th>Status of Action plan</th>
+            <th>Total KRs</th>
+            <th>On process</th>
+            <th>Achieve</th>
+            <th>Not Achieve</th>
+            <th>On Process %</th>
+            <th>Achieve %</th>
+            <th>Not Achieve %</th>
+            <th>Status KRs</th>
+            <th>File Action Plan</th>
+            <th>File Road Map</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Rows will be added dynamically -->
+        </tbody>
+      </table>
+      <button class="btn-add-row" onclick="addRow()"><i class="fa-solid fa-plus"></i> เพิ่มหน่วยงาน (BU)</button>
+    </div>
   </div>
 
   <script>
-    // ข้อมูลเริ่มต้นสำหรับทดสอบ
-    const initialData = [
+    // ตัวอย่างข้อมูลเริ่มต้น (ดึงจาก Excel)
+    const defaultData = [
       { bu: 'ISO', totalTask: 34, taskComplete: 34, taskDelay: 0, totalKRs: 9, onProcess: 2, achieve: 5, notAchieve: 2 },
       { bu: 'CIC', totalTask: 12, taskComplete: 12, taskDelay: 0, totalKRs: 3, onProcess: 0, achieve: 3, notAchieve: 0 },
-      { bu: 'HR', totalTask: 7, taskComplete: 7, taskDelay: 0, totalKRs: 6, onProcess: 3, achieve: 2, notAchieve: 1 }
+      { bu: 'HR', totalTask: 7, taskComplete: 7, taskDelay: 0, totalKRs: 6, onProcess: 3, achieve: 2, notAchieve: 1 },
+      { bu: 'Accounting', totalTask: 7, taskComplete: 7, taskDelay: 0, totalKRs: 2, onProcess: 0, achieve: 2, notAchieve: 0 },
+      { bu: 'FC', totalTask: 10, taskComplete: 10, taskDelay: 0, totalKRs: 4, onProcess: 4, achieve: 0, notAchieve: 0 }
     ];
 
     function createRow(data = {}) {
-      const tbody = document.querySelector("#excelGrid tbody");
+      const tbody = document.querySelector("#roadmapTable tbody");
       const tr = document.createElement("tr");
 
       tr.innerHTML = `
-        <td><input type="text" class="bu" value="${data.bu || ''}"></td>
+        <td style="text-align: left;"><input type="text" class="bu" value="${data.bu || ''}" style="text-align: left;"></td>
         <td><input type="number" class="total-task" value="${data.totalTask ?? ''}" oninput="calculate(this)"></td>
         <td><input type="number" class="task-complete" value="${data.taskComplete ?? ''}" oninput="calculate(this)"></td>
         <td><input type="number" class="task-delay" value="${data.taskDelay ?? ''}" oninput="calculate(this)"></td>
-        <td class="readonly pct-task">0%</td>
-        <td class="readonly status-action">-</td>
+        <td class="pct-task" style="color:#aaa;">0.00%</td>
+        <td class="status-action">-</td>
         <td><input type="number" class="total-krs" value="${data.totalKRs ?? ''}" oninput="calculate(this)"></td>
         <td><input type="number" class="on-process" value="${data.onProcess ?? ''}" oninput="calculate(this)"></td>
         <td><input type="number" class="achieve" value="${data.achieve ?? ''}" oninput="calculate(this)"></td>
         <td><input type="number" class="not-achieve" value="${data.notAchieve ?? ''}" oninput="calculate(this)"></td>
-        <td class="readonly pct-onprocess">0%</td>
-        <td class="readonly pct-achieve">0%</td>
-        <td class="readonly pct-notachieve">0%</td>
-        <td class="readonly status-krs">-</td>
+        <td class="pct-onprocess" style="color:#aaa;">0.00%</td>
+        <td class="pct-achieve" style="color:#aaa;">0.00%</td>
+        <td class="pct-notachieve" style="color:#aaa;">0.00%</td>
+        <td class="status-krs">-</td>
+        
+        <!-- ช่องแนบไฟล์ 1: File Action Plan -->
+        <td>
+          <div class="file-input-wrapper">
+            <label class="file-btn" title="แนบไฟล์ Action Plan">
+              <i class="fa-regular fa-file-excel"></i>
+              <input type="file" onchange="handleFileUpload(this)">
+            </label>
+          </div>
+        </td>
+
+        <!-- ช่องแนบไฟล์ 2: File Road Map Result -->
+        <td>
+          <div class="file-input-wrapper">
+            <label class="file-btn" title="แนบไฟล์ Road Map Result">
+              <i class="fa-regular fa-file-powerpoint"></i>
+              <input type="file" onchange="handleFileUpload(this)">
+            </label>
+          </div>
+        </td>
       `;
 
       tbody.appendChild(tr);
@@ -100,7 +181,6 @@
     function calculate(element) {
       const row = element.closest('tr');
 
-      // อ่านค่าจาก Input
       const totalTask = parseFloat(row.querySelector('.total-task').value) || 0;
       const taskComplete = parseFloat(row.querySelector('.task-complete').value) || 0;
 
@@ -109,7 +189,7 @@
       const achieve = parseFloat(row.querySelector('.achieve').value) || 0;
       const notAchieve = parseFloat(row.querySelector('.not-achieve').value) || 0;
 
-      // 1. คำนวณ % Task และ Status of Action Plan (คอลัมน์ E & F)
+      // 1. คำนวณ % Task และ Status of Action plan
       const pctTaskCell = row.querySelector('.pct-task');
       const statusActionCell = row.querySelector('.status-action');
 
@@ -118,13 +198,13 @@
         statusActionCell.innerHTML = '';
       } else {
         const pctTask = totalTask > 0 ? (taskComplete / totalTask) : 0;
-        pctTaskCell.innerText = (pctTask * 100).toFixed(1) + '%';
+        pctTaskCell.innerText = (pctTask * 100).toFixed(2) + '%';
 
-        // สูตร: =IF(ISBLANK(B3),"",IFS(E3=100%,"Complete",E3<>100%,"Delay"))
+        // เงื่อนไข: ถ้า % = 100% -> "Complete", % <> 100% -> "Delay"
         if (pctTask === 1) {
-          statusActionCell.innerHTML = '<span class="badge status-complete">Complete</span>';
+          statusActionCell.innerHTML = '<span class="badge bg-complete"><i class="fa-regular fa-circle-check"></i> Complete</span>';
         } else {
-          statusActionCell.innerHTML = '<span class="badge status-delay">Delay</span>';
+          statusActionCell.innerHTML = '<span class="badge bg-delay"><i class="fa-regular fa-circle-xmark"></i> Delay</span>';
         }
       }
 
@@ -133,9 +213,9 @@
       const pctAchieve = totalKRs > 0 ? (achieve / totalKRs) : 0;
       const pctNotAchieve = totalKRs > 0 ? (notAchieve / totalKRs) : 0;
 
-      row.querySelector('.pct-onprocess').innerText = (pctOnProcess * 100).toFixed(1) + '%';
-      row.querySelector('.pct-achieve').innerText = (pctAchieve * 100).toFixed(1) + '%';
-      row.querySelector('.pct-notachieve').innerText = (pctNotAchieve * 100).toFixed(1) + '%';
+      row.querySelector('.pct-onprocess').innerText = (pctOnProcess * 100).toFixed(2) + '%';
+      row.querySelector('.pct-achieve').innerText = (pctAchieve * 100).toFixed(2) + '%';
+      row.querySelector('.pct-notachieve').innerText = (pctNotAchieve * 100).toFixed(2) + '%';
 
       // 3. คำนวณ Status KRs (คอลัมน์ N)
       const statusKRsCell = row.querySelector('.status-krs');
@@ -145,31 +225,40 @@
       } else {
         let statusKRs = "";
 
-        // ตรรกะการเปรียบเทียบตามเงื่อนไข
+        // ตรรกะเงื่อนไขที่กำหนด:
         if (pctNotAchieve >= Math.max(pctOnProcess, pctAchieve)) {
-          // ครอบคลุม: 
-          // - Not achieve > On process, Achieve
-          // - On process = Achieved = Not achieved -> Not achieved
-          // - % Not achieve = Achieve -> Not achieve
+          // ครอบคลุม: Not achieve มากสุด / Not achieve = Achieve / เท่ากันหมด
           statusKRs = "Not achieve";
         } else if (pctOnProcess >= pctAchieve) {
-          // ครอบคลุม:
-          // - On process > achieve หรือ not achieve
-          // - On process % = achieve -> On Process
+          // ครอบคลุม: On process มากสุด / On process = Achieve
           statusKRs = "On process";
         } else if (pctAchieve > Math.max(pctOnProcess, pctNotAchieve)) {
-          // ครอบคลุม:
-          // - % achieve > on process หรือ not achieve -> achieve
+          // ครอบคลุม: Achieve มากสุด
           statusKRs = "Achieve";
         }
 
-        // แสดงผล Badge
-        let badgeClass = "";
-        if (statusKRs === "Achieve") badgeClass = "status-achieve";
-        else if (statusKRs === "On process") badgeClass = "status-onprocess";
-        else if (statusKRs === "Not achieve") badgeClass = "status-notachieve";
+        // แสดงผล Badge ตามประเภท Status
+        let badgeHTML = "";
+        if (statusKRs === "Achieve") {
+          badgeHTML = `<span class="badge bg-achieve"><i class="fa-regular fa-face-smile"></i> Achieve</span>`;
+        } else if (statusKRs === "On process") {
+          badgeHTML = `<span class="badge bg-onprocess"><i class="fa-regular fa-face-meh"></i> On Process</span>`;
+        } else if (statusKRs === "Not achieve") {
+          badgeHTML = `<span class="badge bg-notachieve"><i class="fa-regular fa-face-frown"></i> Not Achieve</span>`;
+        }
 
-        statusKRsCell.innerHTML = `<span class="badge ${badgeClass}">${statusKRs}</span>`;
+        statusKRsCell.innerHTML = badgeHTML;
+      }
+    }
+
+    // ฟังก์ชันจัดการแนบไฟล์
+    function handleFileUpload(input) {
+      const label = input.parentElement;
+      if (input.files && input.files[0]) {
+        label.classList.add('has-file');
+        label.title = "แนบไฟล์แล้ว: " + input.files[0].name;
+      } else {
+        label.classList.remove('has-file');
       }
     }
 
@@ -179,7 +268,7 @@
 
     // โหลดข้อมูลเริ่มต้น
     window.onload = () => {
-      initialData.forEach(d => createRow(d));
+      defaultData.forEach(d => createRow(d));
     };
   </script>
 </body>
