@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Progressive of Achieve Data Grid</title>
+  <style>
+    * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    body { padding: 20px; background-color: #f8f9fa; margin: 0; }
+    h2 { color: #333; margin-bottom: 15px; }
+    .table-container { overflow-x: auto; background: #fff; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); padding: 15px; }
+    table { width: 100%; border-collapse: collapse; min-width: 1200px; font-size: 13px; }
+    th, td { border: 1px solid #dee2e6; padding: 8px 10px; text-align: center; }
+    th { background-color: #0d6efd; color: white; font-weight: 600; white-space: nowrap; }
+    tr:nth-child(even) { background-color: #f8f9fa; }
+    input[type="text"], input[type="number"] {
+      width: 100%; border: 1px solid #ced4da; border-radius: 4px; padding: 4px 6px; text-align: center; font-size: 13px;
+    }
+    input[type="number"]:focus, input[type="text"]:focus {
+      outline: 2px solid #86b7fe; border-color: #86b7fe;
+    }
+    .readonly { background-color: #e9ecef; color: #495057; font-weight: bold; }
+    
+    /* Status Badge Styles */
+    .badge { padding: 4px 8px; border-radius: 12px; font-weight: bold; font-size: 11px; display: inline-block; }
+    .status-complete { background-color: #d1e7dd; color: #0f5132; }
+    .status-delay { background-color: #f8d7da; color: #842029; }
+    .status-achieve { background-color: #d1e7dd; color: #0f5132; }
+    .status-onprocess { background-color: #cff4fc; color: #055160; }
+    .status-notachieve { background-color: #f8d7da; color: #842029; }
+    
+    .btn-add { background-color: #198754; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; margin-top: 15px; }
+    .btn-add:hover { background-color: #157347; }
+  </style>
+</head>
+<body>
+
+  <h2>ตารางบันทึกข้อมูล Progressive of Achieve</h2>
+
+  <div class="table-container">
+    <table id="excelGrid">
+      <thead>
+        <tr>
+          <th>BU (A)</th>
+          <th>Total Task (B)</th>
+          <th>Task Complete (C)</th>
+          <th>Task Delay (D)</th>
+          <th>% Task (E)</th>
+          <th>Status Action plan (F)</th>
+          <th>Total KRs (G)</th>
+          <th>On Process (H)</th>
+          <th>Achieve (I)</th>
+          <th>Not Achieve (J)</th>
+          <th>On Process % (K)</th>
+          <th>Achieve % (L)</th>
+          <th>Not Achieve % (M)</th>
+          <th>Status KRs (N)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Data rows generated dynamically -->
+      </tbody>
+    </table>
+    <button class="btn-add" onclick="addRow()">+ เพิ่มแถวข้อมูล</button>
+  </div>
+
+  <script>
+    // ข้อมูลเริ่มต้นสำหรับทดสอบ
+    const initialData = [
+      { bu: 'ISO', totalTask: 34, taskComplete: 34, taskDelay: 0, totalKRs: 9, onProcess: 2, achieve: 5, notAchieve: 2 },
+      { bu: 'CIC', totalTask: 12, taskComplete: 12, taskDelay: 0, totalKRs: 3, onProcess: 0, achieve: 3, notAchieve: 0 },
+      { bu: 'HR', totalTask: 7, taskComplete: 7, taskDelay: 0, totalKRs: 6, onProcess: 3, achieve: 2, notAchieve: 1 }
+    ];
+
+    function createRow(data = {}) {
+      const tbody = document.querySelector("#excelGrid tbody");
+      const tr = document.createElement("tr");
+
+      tr.innerHTML = `
+        <td><input type="text" class="bu" value="${data.bu || ''}"></td>
+        <td><input type="number" class="total-task" value="${data.totalTask ?? ''}" oninput="calculate(this)"></td>
+        <td><input type="number" class="task-complete" value="${data.taskComplete ?? ''}" oninput="calculate(this)"></td>
+        <td><input type="number" class="task-delay" value="${data.taskDelay ?? ''}" oninput="calculate(this)"></td>
+        <td class="readonly pct-task">0%</td>
+        <td class="readonly status-action">-</td>
+        <td><input type="number" class="total-krs" value="${data.totalKRs ?? ''}" oninput="calculate(this)"></td>
+        <td><input type="number" class="on-process" value="${data.onProcess ?? ''}" oninput="calculate(this)"></td>
+        <td><input type="number" class="achieve" value="${data.achieve ?? ''}" oninput="calculate(this)"></td>
+        <td><input type="number" class="not-achieve" value="${data.notAchieve ?? ''}" oninput="calculate(this)"></td>
+        <td class="readonly pct-onprocess">0%</td>
+        <td class="readonly pct-achieve">0%</td>
+        <td class="readonly pct-notachieve">0%</td>
+        <td class="readonly status-krs">-</td>
+      `;
+
+      tbody.appendChild(tr);
+      calculate(tr.querySelector('.total-task'));
+    }
+
+    function calculate(element) {
+      const row = element.closest('tr');
+
+      // อ่านค่าจาก Input
+      const totalTask = parseFloat(row.querySelector('.total-task').value) || 0;
+      const taskComplete = parseFloat(row.querySelector('.task-complete').value) || 0;
+
+      const totalKRs = parseFloat(row.querySelector('.total-krs').value) || 0;
+      const onProcess = parseFloat(row.querySelector('.on-process').value) || 0;
+      const achieve = parseFloat(row.querySelector('.achieve').value) || 0;
+      const notAchieve = parseFloat(row.querySelector('.not-achieve').value) || 0;
+
+      // 1. คำนวณ % Task และ Status of Action Plan (คอลัมน์ E & F)
+      const pctTaskCell = row.querySelector('.pct-task');
+      const statusActionCell = row.querySelector('.status-action');
+
+      if (row.querySelector('.total-task').value.trim() === '') {
+        pctTaskCell.innerText = '';
+        statusActionCell.innerHTML = '';
+      } else {
+        const pctTask = totalTask > 0 ? (taskComplete / totalTask) : 0;
+        pctTaskCell.innerText = (pctTask * 100).toFixed(1) + '%';
+
+        // สูตร: =IF(ISBLANK(B3),"",IFS(E3=100%,"Complete",E3<>100%,"Delay"))
+        if (pctTask === 1) {
+          statusActionCell.innerHTML = '<span class="badge status-complete">Complete</span>';
+        } else {
+          statusActionCell.innerHTML = '<span class="badge status-delay">Delay</span>';
+        }
+      }
+
+      // 2. คำนวณ % KRs (คอลัมน์ K, L, M)
+      const pctOnProcess = totalKRs > 0 ? (onProcess / totalKRs) : 0;
+      const pctAchieve = totalKRs > 0 ? (achieve / totalKRs) : 0;
+      const pctNotAchieve = totalKRs > 0 ? (notAchieve / totalKRs) : 0;
+
+      row.querySelector('.pct-onprocess').innerText = (pctOnProcess * 100).toFixed(1) + '%';
+      row.querySelector('.pct-achieve').innerText = (pctAchieve * 100).toFixed(1) + '%';
+      row.querySelector('.pct-notachieve').innerText = (pctNotAchieve * 100).toFixed(1) + '%';
+
+      // 3. คำนวณ Status KRs (คอลัมน์ N)
+      const statusKRsCell = row.querySelector('.status-krs');
+
+      if (row.querySelector('.total-krs').value.trim() === '' || totalKRs === 0) {
+        statusKRsCell.innerHTML = '';
+      } else {
+        let statusKRs = "";
+
+        // ตรรกะการเปรียบเทียบตามเงื่อนไข
+        if (pctNotAchieve >= Math.max(pctOnProcess, pctAchieve)) {
+          // ครอบคลุม: 
+          // - Not achieve > On process, Achieve
+          // - On process = Achieved = Not achieved -> Not achieved
+          // - % Not achieve = Achieve -> Not achieve
+          statusKRs = "Not achieve";
+        } else if (pctOnProcess >= pctAchieve) {
+          // ครอบคลุม:
+          // - On process > achieve หรือ not achieve
+          // - On process % = achieve -> On Process
+          statusKRs = "On process";
+        } else if (pctAchieve > Math.max(pctOnProcess, pctNotAchieve)) {
+          // ครอบคลุม:
+          // - % achieve > on process หรือ not achieve -> achieve
+          statusKRs = "Achieve";
+        }
+
+        // แสดงผล Badge
+        let badgeClass = "";
+        if (statusKRs === "Achieve") badgeClass = "status-achieve";
+        else if (statusKRs === "On process") badgeClass = "status-onprocess";
+        else if (statusKRs === "Not achieve") badgeClass = "status-notachieve";
+
+        statusKRsCell.innerHTML = `<span class="badge ${badgeClass}">${statusKRs}</span>`;
+      }
+    }
+
+    function addRow() {
+      createRow();
+    }
+
+    // โหลดข้อมูลเริ่มต้น
+    window.onload = () => {
+      initialData.forEach(d => createRow(d));
+    };
+  </script>
+</body>
+</html>
